@@ -127,22 +127,66 @@ struct WorkoutCompletionView: View {
 
 private struct ConfettiBurst: View {
     let animate: Bool
-    private let colors = [FBPalette.lime, FBPalette.cyan, FBPalette.magenta, Color.white, FBPalette.violet]
 
     var body: some View {
         ZStack {
             ForEach(0..<46, id: \.self) { index in
-                Capsule()
-                    .fill(colors[index % colors.count])
-                    .frame(width: index.isMultiple(of: 3) ? 5 : 8, height: index.isMultiple(of: 4) ? 14 : 8)
-                    .rotationEffect(.degrees(animate ? Double(index * 83) : 0))
-                    .offset(
-                        x: animate ? cos(Double(index) * 1.77) * Double(95 + (index % 6) * 18) : 0,
-                        y: animate ? sin(Double(index) * 2.13) * Double(95 + (index % 5) * 24) + 28 : 0
-                    )
-                    .opacity(animate ? 0 : 1)
-                    .animation(.easeOut(duration: 1.1 + Double(index % 7) * 0.07).delay(Double(index % 5) * 0.025), value: animate)
+                ConfettiParticle(index: index, animate: animate)
             }
         }
+    }
+}
+
+private struct ConfettiParticle: View {
+    let index: Int
+    let animate: Bool
+
+    private static let colors = [
+        FBPalette.lime,
+        FBPalette.cyan,
+        FBPalette.magenta,
+        Color.white,
+        FBPalette.violet,
+    ]
+
+    private var particleColor: Color {
+        Self.colors[index % Self.colors.count]
+    }
+
+    private var particleSize: CGSize {
+        CGSize(
+            width: index.isMultiple(of: 3) ? 5 : 8,
+            height: index.isMultiple(of: 4) ? 14 : 8
+        )
+    }
+
+    private var particleOffset: CGSize {
+        guard animate else { return .zero }
+
+        let horizontalRadius = CGFloat(95 + (index % 6) * 18)
+        let verticalRadius = CGFloat(95 + (index % 5) * 24)
+        let horizontalWave = CGFloat(cos(Double(index) * 1.77))
+        let verticalWave = CGFloat(sin(Double(index) * 2.13))
+
+        return CGSize(
+            width: horizontalWave * horizontalRadius,
+            height: verticalWave * verticalRadius + 28
+        )
+    }
+
+    private var particleAnimation: Animation {
+        let duration = 1.1 + Double(index % 7) * 0.07
+        let delay = Double(index % 5) * 0.025
+        return .easeOut(duration: duration).delay(delay)
+    }
+
+    var body: some View {
+        Capsule()
+            .fill(particleColor)
+            .frame(width: particleSize.width, height: particleSize.height)
+            .rotationEffect(.degrees(animate ? Double(index * 83) : 0))
+            .offset(particleOffset)
+            .opacity(animate ? 0 : 1)
+            .animation(particleAnimation, value: animate)
     }
 }

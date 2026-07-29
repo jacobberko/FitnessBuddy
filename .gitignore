@@ -1,0 +1,22 @@
+.DS_Store
+**/.DS_Store
+
+# Xcode user state and local build products
+**/xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.xcresult
+*.xcarchive
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+AIBackend/.dev.vars
+
+# Local backup of assets intentionally excluded from the release
+.release-archive/
